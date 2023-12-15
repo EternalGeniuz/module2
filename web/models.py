@@ -16,7 +16,7 @@ class TimeSlot(models.Model):
     is_realtime = models.BooleanField(default=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     tags = models.ManyToManyField(TimeSlotTag)
-
+    image = models.ImageField(upload_to='time_slots/', null=True, blank=True)
 
 class Holiday(models.Model):
     date = models.DateField()
