@@ -1,6 +1,6 @@
 from _datetime import datetime as dt
 
-from django.contrib.auth import get_user_model, authenticate, login
+from django.contrib.auth import get_user_model, authenticate, login, logout
 from django.shortcuts import render, redirect
 
 from .forms import RegistrationForm, AuthForm
@@ -26,9 +26,9 @@ def registration_view(request):
             user.set_password(form.cleaned_data["password"])
             user.save()
             is_success = True
-    return render(request, "web/registration.html", {
-        "form": form,
-        "is_success": is_success})
+    return render(
+        request, "web/registration.html", {"form": form, "is_success": is_success}
+    )
 
 
 def auth_view(request):
@@ -41,6 +41,10 @@ def auth_view(request):
                 form.add_error(None, "Введены неверные данные!")
             else:
                 login(request, user)
-                return redirect('main')
+                return redirect("main")
     return render(request, "web/auth.html", {"form": form})
 
+
+def logout_view(request):
+    logout(request)
+    return redirect("main")
