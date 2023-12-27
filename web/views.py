@@ -1,9 +1,9 @@
 from _datetime import datetime as dt
 
-from django.contrib.auth import get_user_model
-from django.shortcuts import render
+from django.contrib.auth import get_user_model, authenticate, login
+from django.shortcuts import render, redirect
 
-from .forms import RegistrationForm
+from .forms import RegistrationForm, AuthForm
 
 User = get_user_model()
 
@@ -29,3 +29,18 @@ def registration_view(request):
     return render(request, "web/registration.html", {
         "form": form,
         "is_success": is_success})
+
+
+def auth_view(request):
+    form = AuthForm()
+    if request.method == "POST":
+        form = AuthForm(data=request.POST)
+        if form.is_valid():
+            user = authenticate(**form.cleaned_data)
+            if user is None:
+                form.add_error(None, "Введены неверные данные!")
+            else:
+                login(request, user)
+                return redirect('main')
+    return render(request, "web/auth.html", {"form": form})
+
