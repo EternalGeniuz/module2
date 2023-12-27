@@ -1,0 +1,8 @@
+{% extends 'web/base.html' %}
+{% block content %}
+    <h2>Создание time-слота</h2>
+    <form action="" method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button>Сохранить</button>
+{% endblock %}

@@ -1,22 +1,17 @@
 {% extends 'web/base.html' %}
 {% block content %}
-{% if not user.is_anonymous %}
-    Вы авторизованы как <b>{{ user.username }}</b>
-{% endif %}
-<article class="article article_whitebg article_first">
-    <h2 class="black">Это моя первая<br>страница!</h2>
-    <p class="black">Я научился писать <strong>HTML</strong>, а теперь я подключил свой первый стилевой файл и всё
-        стало красивым :) Очень скоро я научусь делать такие же красивые страницы, а вы будете мне завидовать!</p>
-</article>
-<article class="article article_bluebg article_second">
-    <h2 class="white">Свяжись со мной!</h2>
-    <p class="white">Ты по-любому захочешь, чтобы я сделал такую же красоту и тебе. Поэтому я создал форму обратной
-        связи! Пиши, не стесняйся :)</p>
-    <form class="form">
-        <input type="email" class="form_input" placeholder="E-mail">
-        <input type="text" class="form_input" placeholder="Имя">
-        <textarea class="form_textarea" placeholder="Ваше сообщение"></textarea>
-        <button class="form_button" type="button">Отправить</button>
-    </form>
-</article>
+
+<ul>
+{% for timeslot in timeslots %}
+    <li>
+        <b>{{ timeslot.title }}</b>
+        с {{ timeslot.start_date|date:"SHORT_DATETIME_FORMAT" }} по {{ timeslot.end_date|date:"SHORT_DATETIME_FORMAT" }}
+        {% if timeslot.is_realtime %}
+        <small>(realtime)</small>
+        {% endif %}
+        <a href="{% url 'time_slot_edit' timeslot.id %}"><b>Редактировать</b></a>
+    </li>
+{% endfor %}
+</ul>
+
 {% endblock %}

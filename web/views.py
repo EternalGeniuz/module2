@@ -1,16 +1,15 @@
-from _datetime import datetime as dt
-
 from django.contrib.auth import get_user_model, authenticate, login, logout
 from django.shortcuts import render, redirect
 
-from .forms import RegistrationForm, AuthForm
+from .forms import RegistrationForm, AuthForm, TimeSlotForm
+from .models import TimeSlot
 
 User = get_user_model()
 
 
 def main_view(request):
-    year = dt.now().year
-    return render(request, "web/main.html", {"year": year})
+    timeslots = TimeSlot.objects.all()
+    return render(request, "web/main.html", {"timeslots": timeslots})
 
 
 def registration_view(request):
@@ -48,3 +47,26 @@ def auth_view(request):
 def logout_view(request):
     logout(request)
     return redirect("main")
+
+
+def time_slot_add_view(request):
+    form = TimeSlotForm()
+    if request.method == "POST":
+        form = TimeSlotForm(data=request.POST, initial={"user": request.user})
+        if form.is_valid():
+            form.save()
+            return redirect("main")
+    return render(request, "web/time_slot_form.html", {"form": form})
+
+
+def time_slot_edit_view(request, id=None):
+    timeslot = None
+    if id is not None:
+        timeslot = TimeSlot.objects.get(id=id)
+    form = TimeSlotForm(instance=timeslot)
+    if request.method == "POST":
+        form = TimeSlotForm(data=request.POST, initial={"user": request.user}, instance=timeslot)
+        if form.is_valid():
+            form.save()
+            return redirect("main")
+    return render(request, "web/time_slot_form.html", {"form": form})

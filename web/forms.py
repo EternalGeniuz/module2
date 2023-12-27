@@ -1,11 +1,14 @@
 from django import forms
 from django.contrib.auth import get_user_model
 
+from .models import TimeSlot
+
 User = get_user_model()
 
 
 class RegistrationForm(forms.ModelForm):
     password2 = forms.CharField(widget=forms.PasswordInput)
+    password = forms.CharField(widget=forms.PasswordInput)
 
     def clean(self):
         cleaned_data = super().clean()
@@ -21,3 +24,24 @@ class RegistrationForm(forms.ModelForm):
 class AuthForm(forms.Form):
     username = forms.CharField()
     password = forms.CharField(widget=forms.PasswordInput)
+
+
+class TimeSlotForm(forms.ModelForm):
+    start_date = forms.DateTimeField(
+        widget=forms.DateTimeInput(
+            attrs={"type": "datetime-local"},
+            format='%Y-%m-%dT%H:%M'
+        ))
+    end_date = forms.DateTimeField(
+        widget=forms.DateTimeInput(
+            attrs={"type": "datetime-local"},
+            format='%Y-%m-%dT%H:%M'
+        ))
+
+    def save(self, commit=True):
+        self.instance.user = self.initial['user']
+        return super().save(commit)
+
+    class Meta:
+        model = TimeSlot
+        fields = ("title", "start_date", "end_date")
