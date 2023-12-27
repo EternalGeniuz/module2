@@ -8,12 +8,20 @@
 <h1><a href="{% url 'main' %}">TimeTracker</a></h1>
 <nav>
     <a href="{% url 'main' %}">Главная</a>
-    {% if user.is_anonymous %}
+    <a href="{% url 'time_slot_add' %}"><b>Добавить time-слот</b></a>
+    <div style='text-align: right'>
+        {% if not user.is_anonymous %}
+        <p>Вы авторизованы как <b>{{ user.username }}</b></p>
+        {% endif %}
+    </div>
+    <div style='text-align: right'>
+        {% if user.is_anonymous %}
         <a href="{% url 'registration' %}">Регистрация</a>
         <a href="{% url 'auth' %}">Вход</a>
-    {% else %}
+        {% else %}
         <a href="{% url 'logout' %}">Выход</a>
-    {% endif %}
+        {% endif %}
+    </div>
 </nav>
 
 {% block content %}
