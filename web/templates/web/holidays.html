@@ -1,0 +1,17 @@
+{% extends 'web/base.html' %}
+{% block content %}
+    <h2>Выходные</h2>
+    <ul>
+        {% for tag in items %}
+            <li>{{ tag.date }}
+            <small><a href="{% url 'holidays_delete' tag.id %}">Удалить</a></small>
+                 </li>
+        {% endfor %}
+    </ul>
+    <b>Добавление выходного</b>
+        <form action="" method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button>Сохранить</button>
+        </form>
+{% endblock %}
