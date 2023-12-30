@@ -11,15 +11,12 @@
     <a href="{% url 'time_slot_add' %}"><b>Добавить time-слот</b></a>
     <div style='text-align: right'>
         {% if not user.is_anonymous %}
-        <p>Вы авторизованы как <b>{{ user.username }}</b></p>
+        <p>Вы авторизованы как <b>{{ user.username }}</b>
+            <a href="{% url 'logout' %}">Выход</a></p>
         {% endif %}
-    </div>
-    <div style='text-align: right'>
         {% if user.is_anonymous %}
         <a href="{% url 'registration' %}">Регистрация</a>
         <a href="{% url 'auth' %}">Вход</a>
-        {% else %}
-        <a href="{% url 'logout' %}">Выход</a>
         {% endif %}
     </div>
 </nav>
