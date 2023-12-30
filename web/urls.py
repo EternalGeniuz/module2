@@ -7,6 +7,10 @@ from .views import (
     logout_view,
     time_slot_add_view,
     time_slot_edit_view,
+    tags_view,
+    tags_delete_view,
+    holidays_delete_view,
+    holidays_view,
 )
 
 urlpatterns = [
@@ -16,5 +20,9 @@ urlpatterns = [
     path('logout/', logout_view, name='logout'),
     path('time_slots/add/', time_slot_add_view, name='time_slot_add'),
     path('time_slots/<int:id>/', time_slot_edit_view, name='time_slot_edit'),
+    path('tags/', tags_view, name='tags'),
+    path('tags/<int:id>/delete', tags_delete_view, name='tags_delete'),
+    path('holidays/', holidays_view, name='holidays'),
+    path('holidays/<int:id>/delete', holidays_delete_view, name='holidays_delete'),
 
 ]
