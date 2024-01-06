@@ -6,16 +6,17 @@
 </head>
 <body>
 <h1><a href="{% url 'main' %}">TimeTracker</a></h1>
+
 <nav>
-    <a href="{% url 'main' %}">Слоты</a>
-    <a href="{% url 'time_slot_add' %}">Добавить time-слот</a>
-    <a href="{% url 'tags' %}">Теги</a>
-    <a href="{% url 'holidays' %}">Выходные</a>
-    <div style='text-align: right'>
-        {% if not user.is_anonymous %}
-        <p>Вы авторизованы как <b>{{ user.username }}</b>
-            <a href="{% url 'logout' %}">Выход</a></p>
-        {% endif %}
+    {% if not user.is_anonymous %}
+        <a href="{% url 'main' %}">Слоты</a>
+        <a href="{% url 'time_slot_add' %}">Добавить time-слот</a>
+        <a href="{% url 'tags' %}">Теги</a>
+        <a href="{% url 'holidays' %}">Выходные</a>
+        <div style='text-align: right'>
+            <p>Вы авторизованы как <b>{{ user.username }}</b>
+                <a href="{% url 'logout' %}">Выход</a></p>
+    {% endif %}
         {% if user.is_anonymous %}
         <a href="{% url 'registration' %}">Регистрация</a>
         <a href="{% url 'auth' %}">Вход</a>
