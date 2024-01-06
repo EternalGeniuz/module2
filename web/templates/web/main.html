@@ -1,17 +1,38 @@
 {% extends 'web/base.html' %}
 {% block content %}
-
-<ul>
-{% for timeslot in timeslots %}
-    <li>
-        <b>{{ timeslot.title }}</b>
-        с {{ timeslot.start_date|date:"SHORT_DATETIME_FORMAT" }} по {{ timeslot.end_date|date:"SHORT_DATETIME_FORMAT" }}
-        {% if timeslot.is_realtime %}
-        <small>(realtime)</small>
-        {% endif %}
-        <a href="{% url 'time_slot_edit' timeslot.id %}"><b>Редактировать</b></a>
-    </li>
-{% endfor %}
-</ul>
-
+<div>
+    {% if current_timeslot %}
+        <b>Текущий time-слот:</b> {{ current_timeslot.title }} <br>
+        <small>Начат {{current_timeslot.start_date }}</small>
+        <form action="{% url 'time_slot_stop' current_timeslot.id%}" method="post">
+            {% csrf_token %}
+            <button>Закончить</button>
+        </form>
+    {% else %}
+        <b>Добавить time-слот</b>
+        <form action="{% url 'time_slot_add' %}" method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button>Сохранить</button>
+        </form>
+    {% endif %}
+</div>
+<div>
+    <ul>
+        {% for timeslot in timeslots %}
+        <li>
+            <b>{{ timeslot.title }}</b>
+            {% if timeslot.is_realtime %}
+            <small>(realtime)</small>
+            {% endif %}
+            <br>
+            <small>с {{ timeslot.start_date|date:"SHORT_DATETIME_FORMAT" }} {% if timeslot.end_date %} по
+                {{ timeslot.end_date|date:"SHORT_DATETIME_FORMAT" }} {% endif %}
+                <a href="{% url 'time_slot_edit' timeslot.id %}"><b>Редактировать</b></a>
+                <a href="{% url 'time_slot_delete' timeslot.id %}"><b>Удалить</b></a>
+            </small>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
 {% endblock %}
