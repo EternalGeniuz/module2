@@ -17,6 +17,18 @@
         </form>
     {% endif %}
 </div>
+
+<hr>
+<form action="">
+    <b>Фильтры:</b>
+
+    {% for field in filter_form %}
+        {{ field }}
+    {% endfor %}
+
+    <button>Найти</button>
+</form>
+
 <div>
     <ul>
         {% for timeslot in timeslots %}
@@ -34,5 +46,20 @@
         </li>
         {% endfor %}
     </ul>
+
+    Time-слотов: {{ total_count }}. На этой странице: {{ timeslots|length }} <br>
+    <nav>
+        {% if timeslots.has_previous %}
+            <a href="?page=1">В начало</a>
+            <a href="?page={{ timeslots.previous_page_number }}">Предыдущая</a>
+        {% endif %}
+
+        Страница {{ timeslots.number }} из {{ timeslots.paginator.num_pages }}
+
+        {% if timeslots.has_next %}
+            <a href="?page={{ timeslots.next_page_number }}">Следующая</a>
+            <a href="?page={{ timeslots.paginator.num_pages }}">В конец</a>
+        {% endif %}
+    </nav>
 </div>
 {% endblock %}
