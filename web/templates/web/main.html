@@ -21,7 +21,6 @@
 <hr>
 <form action="">
     <b>Фильтры:</b>
-
     {% for field in filter_form %}
         {{ field.label }}
         {{ field }}
@@ -36,9 +35,17 @@
         {% for timeslot in timeslots %}
         <li>
             <b>{{ timeslot.title }}</b>
-            {% if timeslot.is_realtime %}
-            <small>(realtime)</small>
+            <small>
+            {% if timeslot.tags.all %}
+                [{% for tag in timeslot.tags.all %} {{ tag.title}} {% endfor %}]
             {% endif %}
+
+            {{ timeslot.user.username }}
+
+            {% if timeslot.is_realtime %}
+            (realtime)
+            {% endif %}
+                </small>
             <br>
             <small>с {{ timeslot.start_date|date:"SHORT_DATETIME_FORMAT" }} {% if timeslot.end_date %} по
                 {{ timeslot.end_date|date:"SHORT_DATETIME_FORMAT" }} {% endif %}
