@@ -7,21 +7,24 @@
 <body>
 <h1><a href="{% url 'main' %}">TimeTracker</a></h1>
 
-<nav>
+<nav style="overflow: hidden;">
     {% if not user.is_anonymous %}
+    <hr>
         <a href="{% url 'main' %}">Слоты</a>
         <a href="{% url 'time_slot_add' %}">Добавить time-слот</a>
+        <a href="{% url 'analytics' %}">Аналитика</a>
         <a href="{% url 'tags' %}">Теги</a>
         <a href="{% url 'holidays' %}">Выходные</a>
-        <div style='text-align: right'>
-            <p>Вы авторизованы как <b>{{ user.username }}</b>
-                <a href="{% url 'logout' %}">Выход</a></p>
+        <div style='float: right;'>
+            Вы авторизованы как <b>{{ user.username }}</b>
+                <a href="{% url 'logout' %}">Выход</a>
     {% endif %}
         {% if user.is_anonymous %}
         <a href="{% url 'registration' %}">Регистрация</a>
         <a href="{% url 'auth' %}">Вход</a>
         {% endif %}
     </div>
+        <hr>
 </nav>
 
 {% block content %}

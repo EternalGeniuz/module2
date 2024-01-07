@@ -1,0 +1,20 @@
+{% extends 'web/base.html' %}
+{% block content %}
+<h2>Аналитика</h2>
+<p>
+    Time-слотов: <b>{{ overall_stat.id__count }}</b>
+    Максимальная дата: <b>{{ overall_stat.end_date__max }}</b>
+    Минимальная дата: <b>{{ overall_stat.start_date__min}}</b>
+</p>
+
+<h3><b>Статистика по дням</b></h3>
+<ul>
+    {% for day_stat in days_stat %}
+    <li><b>{{day_stat.date}}</b> -
+        cлотов: {{ day_stat.count }},
+        {{ day_stat.realtime_count }} в реалтайме.
+        Времени потрачено: {{ day_stat.spent_time  }}.
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}

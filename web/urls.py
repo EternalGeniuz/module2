@@ -13,11 +13,13 @@ from .views import (
     holidays_view,
     time_slot_delete_view,
     time_slot_stop_view,
+    analytics_view,
 )
 
 
 urlpatterns = [
     path('', main_view, name='main'),
+    path('analytics/', analytics_view, name='analytics'),
     path('registration/', registration_view, name='registration'),
     path('auth/', auth_view, name='auth'),
     path('logout/', logout_view, name='logout'),
