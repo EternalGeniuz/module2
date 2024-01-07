@@ -13,7 +13,10 @@ class RegistrationForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
         if cleaned_data["password"] != cleaned_data["password2"]:
-            self.add_error("password", "Пароли не совпадают")
+            self.add_error(
+                "password",
+                "Пароли не совпадают"
+            )
         return cleaned_data
 
     class Meta:
@@ -38,10 +41,12 @@ class TimeSlotForm(forms.ModelForm):
         fields = ("title", "start_date", "end_date", "image", "tags")
         widgets = {
             "start_date": forms.DateTimeInput(
-                attrs={"type": "datetime-local"}, format="%Y-%m-%dT%H:%M"
+                attrs={"type": "datetime-local"},
+                format="%Y-%m-%dT%H:%M"
             ),
             "end_date": forms.DateTimeInput(
-                attrs={"type": "datetime-local"}, format="%Y-%m-%dT%H:%M"
+                attrs={"type": "datetime-local"},
+                format="%Y-%m-%dT%H:%M"
             ),
         }
 
@@ -65,39 +70,47 @@ class HolidayForm(forms.ModelForm):
         model = Holiday
         fields = ("date",)
         widgets = {
-            "date": forms.DateTimeInput(attrs={"type": "date"}, format="%Y-%m-%dT%H:%M")
+            "date": forms.DateTimeInput(
+                attrs={"type": "date"},
+                format="%Y-%m-%dT%H:%M"
+            )
         }
 
 
 class TimeSlotFilterForm(forms.Form):
     search = forms.CharField(
-        label = "",
-        widget=forms.TextInput(attrs={"placeholder": "Поиск"}), required=False
+        label="",
+        widget=forms.TextInput(
+            attrs={"placeholder": "Поиск"}
+        ),
+        required=False
     )
 
     is_realtime = forms.NullBooleanField(
-        label = "Реалтайм",
+        label="Реалтайм",
         widget=forms.Select(
             choices=(
                 ("Unknown", "<Без фильтра>"),
                 ("True", "Да"),
                 ("False", "Нет"),
             )
-        )
+        ),
     )
 
     start_date = forms.DateTimeField(
         label="От",
         widget=forms.DateTimeInput(
-            attrs={"type": "datetime-local"}, format="%Y-%m-%dT%H:%M"
+            attrs={"type": "datetime-local"},
+            format="%Y-%m-%dT%H:%M"
         ),
-        required=False
+        required=False,
     )
 
     end_date = forms.DateTimeField(
         label="до",
         widget=forms.DateTimeInput(
-            attrs={"type": "datetime-local"}, format="%Y-%m-%dT%H:%M"
+            attrs={"type": "datetime-local"},
+            format="%Y-%m-%dT%H:%M"
         ),
-        required=False
+        required=False,
     )

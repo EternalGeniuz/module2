@@ -1,6 +1,8 @@
 from django.contrib.auth import get_user_model, authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+from django.db.models import Count, F, Max, Min, Q, Sum
+from django.db.models.functions import TruncDate
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 
@@ -39,10 +41,14 @@ def main_view(request):
         timeslots = timeslots.filter(end_date__lte=filters["end_date"])
 
     total_count = timeslots.count()
-    timeslots = timeslots.prefetch_related("tags").select_related("user")
+    timeslots = (
+        timeslots.prefetch_related("tags")
+        .select_related("user")
+        .annotate(tags_count=Count("tags"), spent_time=F("end_date") - F("start_date"))
+    )
 
     page_number = request.GET.get("page", 1)
-    paginator = Paginator(timeslots, per_page=10000)
+    paginator = Paginator(timeslots, per_page=10)
 
     return render(
         request,
@@ -55,6 +61,32 @@ def main_view(request):
             "total_count": total_count,
         },
     )
+
+
+@login_required
+def analytics_view(request):
+    overall_stat = TimeSlot.objects.aggregate(
+        Count("id"),
+        Max("end_date"),
+        Min("start_date")
+    )
+
+    days_stat = (
+        TimeSlot.objects.exclude(end_date__isnull=True)
+        .annotate(date=TruncDate("start_date"))
+        .values("date")
+        .annotate(
+            count=Count("id"),
+            realtime_count=Count("id", filter=Q(is_realtime=True)),
+            spent_time=Sum(F("end_date") - F("start_date"))
+        )
+        .order_by("-date")
+    )
+
+    return render(request, "web/analytics.html", {
+        "overall_stat": overall_stat,
+        "days_stat": days_stat
+    })
 
 
 def registration_view(request):
@@ -71,7 +103,12 @@ def registration_view(request):
             user.save()
             is_success = True
     return render(
-        request, "web/registration.html", {"form": form, "is_success": is_success}
+        request,
+        "web/registration.html",
+        {
+            "form": form,
+            "is_success": is_success
+        }
     )
 
 
@@ -151,7 +188,14 @@ def _list_editor_view(request, model_cls, form_cls, template_name, url_name):
         if form.is_valid():
             form.save()
             return redirect(url_name)
-    return render(request, f"web/{template_name}.html", {"items": items, "form": form})
+    return render(
+        request,
+        f"web/{template_name}.html",
+        {
+            "items": items,
+            "form": form
+        }
+    )
 
 
 @login_required
