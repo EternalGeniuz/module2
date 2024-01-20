@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Count, F, Max, Min, Q, Sum
 from django.db.models.functions import TruncDate
+from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 
@@ -12,9 +13,10 @@ from .forms import (
     TimeSlotForm,
     TimeSlotTagForm,
     HolidayForm,
-    TimeSlotFilterForm,
+    TimeSlotFilterForm, ImportForm,
 )
 from .models import TimeSlot, TimeSlotTag, Holiday
+from .services import filter_timeslots, export_timeslots_csv, import_timeslots_from_csv
 
 User = get_user_model()
 
@@ -26,19 +28,7 @@ def main_view(request):
 
     filter_form = TimeSlotFilterForm(request.GET)
     filter_form.is_valid()
-    filters = filter_form.cleaned_data
-
-    if filters["search"]:
-        timeslots = timeslots.filter(title__icontains=filters["search"])
-
-    if filters["is_realtime"] is not None:
-        timeslots = timeslots.filter(is_realtime=filters["is_realtime"])
-
-    if filters["start_date"]:
-        timeslots = timeslots.filter(start_date__gte=filters["start_date"])
-
-    if filters["end_date"]:
-        timeslots = timeslots.filter(end_date__lte=filters["end_date"])
+    timeslots = filter_timeslots(timeslots, filter_form.cleaned_data)
 
     total_count = timeslots.count()
     timeslots = (
@@ -49,6 +39,13 @@ def main_view(request):
 
     page_number = request.GET.get("page", 1)
     paginator = Paginator(timeslots, per_page=10)
+
+    if 'export' in request.GET and request.GET['export'] == "csv":
+        response = HttpResponse(
+            content_type='text/csv',
+            headers={"Content-Disposition": "attachment; filename=timeslots.csv"}
+        )
+        return export_timeslots_csv(timeslots, response)
 
     return render(
         request,
@@ -62,6 +59,21 @@ def main_view(request):
         },
     )
 
+
+@login_required
+def import_view(request):
+    if request.method == 'POST':
+        form = ImportForm(files=request.FILES)
+        if form.is_valid():
+            import_timeslots_from_csv(form.cleaned_data['file'], request.user.id)
+            return redirect('main')
+    return render(
+        request,
+        "web/import.html",
+        {
+            "form": ImportForm()
+        },
+    )
 
 @login_required
 def analytics_view(request):
