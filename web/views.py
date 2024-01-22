@@ -6,7 +6,9 @@ from django.db.models.functions import TruncDate
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
+from django.views.decorators.cache import cache_page
 
+from timetracker.redis import get_redis_client
 from .forms import (
     RegistrationForm,
     AuthForm,
@@ -21,6 +23,7 @@ from .services import filter_timeslots, export_timeslots_csv, import_timeslots_f
 User = get_user_model()
 
 
+@cache_page(30)
 @login_required
 def main_view(request):
     timeslots = TimeSlot.objects.filter(user=request.user).order_by("-start_date")
@@ -34,12 +37,12 @@ def main_view(request):
     timeslots = (
         timeslots.prefetch_related("tags")
         .select_related("user")
-        .annotate(tags_count=Count("tags"),)
+        .annotate(tags_count=Count("tags"), )
         .annotate_spent_time()
     )
 
     page_number = request.GET.get("page", 1)
-    paginator = Paginator(timeslots, per_page=10)
+    paginator = Paginator(timeslots, per_page=1000)
 
     if 'export' in request.GET and request.GET['export'] == "csv":
         response = HttpResponse(
@@ -75,6 +78,22 @@ def import_view(request):
             "form": ImportForm()
         },
     )
+
+
+@login_required
+def stat_view(request):
+    redis = get_redis_client()
+    keys = redis.keys("stat_*")
+    results = [(key.decode().replace("stat_", ""), redis.get(key).decode()) for key in keys]
+    print(results)
+    return render(
+        request,
+        "web/stat.html",
+        {
+            "results": results
+        },
+    )
+
 
 @login_required
 def analytics_view(request):
