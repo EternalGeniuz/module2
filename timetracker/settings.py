@@ -9,12 +9,11 @@ https://docs.djangoproject.com/en/5.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -26,7 +25,6 @@ SECRET_KEY = "django-insecure-@w#gqkc%y4mpguiali)gw+14i+^mcrq3as5)tyux6ttf0t8q7!
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -48,7 +46,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "timetracker.debug.SqlPrintingMiddleware"
+    "timetracker.middlewares.SqlPrintingMiddleware",
+    "timetracker.middlewares.StatMiddleware"
 ]
 
 ROOT_URLCONF = "timetracker.urls"
@@ -71,20 +70,30 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "timetracker.wsgi.application"
 
-
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "timetracker",
-        "USER": "postgres",
-        "PASSWORD": "123456",
-        "HOST": "localhost",
+        "NAME": os.environ.get("DB_NAME", "timetracker"),
+        "USER": os.environ.get("DB_USER", "postgres"),
+        "PASSWORD": os.environ.get("DB_PASSWORD", "123456"),
+        "HOST": os.environ.get("DB_HOST", "localhost"),
     }
 }
-
+REDIS_HOST = os.environ.get("REDIS_HOST", "127.0.0.1")
+REDIS_DB = os.environ.get("REDIS_DB", 0)
+REDIS_PORT = 6379
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -104,7 +113,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
@@ -115,7 +123,6 @@ TIME_ZONE = "Europe/Moscow"
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
